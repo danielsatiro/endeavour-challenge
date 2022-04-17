@@ -29,6 +29,18 @@ services:
             - "docker.host:127.0.0.1"
         networks:
             - internal
+    build:
+        build: ./docker/build
+        ports:
+            - "9004:9000"
+        volumes:
+            - .:/var/www/api:cached
+            - ./docker/var/log/api:/var/www/api/var/log:cached
+        links:
+            - db
+            - redis
+        networks:
+            - internal
     nginx:
         build: ./docker/nginx
         ports:
