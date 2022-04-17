@@ -11,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 use Exception;
+use App\Services\CSVReader;
 
 class ProcessUploadedFile implements ShouldQueue
 {
@@ -37,12 +38,21 @@ class ProcessUploadedFile implements ShouldQueue
      */
     public function handle()
     {
-        $content = Storage::get($this->filePath);
         $contentArray = [];
 
         switch ($this->fileExtension) {
+            case 'csv':
+                $contentArray = CSVReader::readWithHead(Storage::path($this->filePath));
+                break;
+
             case 'json':
+                $content = Storage::get($this->filePath);
                 $contentArray = json_decode($content, true);
+                break;
+
+            case 'xml':
+                $content = Storage::get($this->filePath);
+                $contentArray = $this->convertXmlToArray($content);
                 break;
 
             default:
@@ -53,5 +63,13 @@ class ProcessUploadedFile implements ShouldQueue
         foreach ($contentArray as $value) {
             ProcessData::dispatch($value);
         }
+    }
+
+    private function convertXmlToArray($content)
+    {
+        $xmlObject = simplexml_load_string($content);
+        $json = json_encode($xmlObject);
+        $contentDecoded = json_decode($json, true);
+        return $contentDecoded['row'];
     }
 }

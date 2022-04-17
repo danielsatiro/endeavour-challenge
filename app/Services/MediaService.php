@@ -75,7 +75,7 @@ class MediaService
         }
 
         if (config('filesystems.default') == 'local') {
-            (new Filesystem())->ensureDirectoryExists(storage_path($pathStorage));
+            (new Filesystem())->ensureDirectoryExists(Storage::path($pathStorage));
         }
 
         Storage::put($pathStorage, $file);

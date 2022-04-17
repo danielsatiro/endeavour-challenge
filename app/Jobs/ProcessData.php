@@ -22,7 +22,7 @@ class ProcessData implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($data)
+    public function __construct(array $data)
     {
         $this->data = $data;
     }
@@ -53,6 +53,10 @@ class ProcessData implements ShouldQueue
             return false;
         }
 
+        $this->data['checked'] = $this->convertToBoolean($this->data['checked']);
+        $this->data['interest'] = empty($this->data['interest']) ? null : $this->data['interest'];
+        $this->data['date_of_birth'] = empty($this->data['date_of_birth']) ? null : $this->data['date_of_birth'];
+
         $user = User::create($this->data);
         $user->creditCard()->create($this->data['credit_card']);
     }
@@ -82,5 +86,16 @@ class ProcessData implements ShouldQueue
         if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', $string)) {
             return 'd.m.Y';
         }
+    }
+
+    private function convertToBoolean($value)
+    {
+        $trues = [true, 1, '1', 'true', 'yes', 'True', 'TRUE'];
+
+        if (in_array($value, $trues, true)) {
+            return true;
+        }
+
+        return false;
     }
 }

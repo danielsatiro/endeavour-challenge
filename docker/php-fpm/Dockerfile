@@ -54,6 +54,7 @@ COPY supervisor.ini /etc/supervisor.d/supervisord.ini
 #ADD xdebug.ini  /etc/php8/conf.d/
 
 ADD api.pool.conf /etc/php8/php-fpm.d/
+COPY php.ini /etc/php8/php.ini
 
 #CMD ["php-fpm8", "-F"]
 
